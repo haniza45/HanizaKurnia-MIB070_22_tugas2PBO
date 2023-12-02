@@ -1,34 +1,37 @@
 <?php
 session_start();
+include('dbcon.php');
 
-include('dbconn.php');
-include('StudentController.php');
-
-$db = new DatabaseConnection;
-
-if(isset($_POST['save_student']))
+if(isset($_POST['save_student_btn']))
 {
-    $inputData = [
-        'fullname' => mysqli_real_escape_string($db->conn,$_POST['fullname']),
-        'email' => mysqli_real_escape_string($db->conn,$_POST['email']),
-        'phone' => mysqli_real_escape_string($db->conn,$_POST['phone']),
-        'course' => mysqli_real_escape_string($db->conn,$_POST['course']),
-    ];
+    $fullname = $_POST['fullname'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $course = $_POST['course'];
 
-    $student = new StudentController;
-    $result = $student->create($inputData);
-    
-    if($result)
+    $query = "INSERT INTO students (fullname, email, phone, course) VALUES (:fullname, :email, :phone, :course)";
+    $query_run = $conn->prepare($query);
+
+    $data = [
+        ':fullname' => $fullname,
+        ':email' => $email,
+        ':phone' => $phone,
+        ':course' => $course,
+    ];
+    $query_execute = $query_run->execute($data);
+
+    if($query_execute)
     {
-        $_SESSION['message'] = "Student Added Successfully";
-        header("Location: student-add.php");
+        $_SESSION['message'] = "Inserted Successfully";
+        header('Location: student-add.php');
         exit(0);
     }
     else
     {
         $_SESSION['message'] = "Not Inserted";
-        header("Location: student-add.php");
+        header('Location: student-add.php');
         exit(0);
     }
 }
+
 ?>
